@@ -1,5 +1,9 @@
 @extends('layouts.admin')
 @section('title', 'Modifier — ' . $product->name)
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Produits</a></li>
+    <li class="breadcrumb-item active">Modifier</li>
+@endsection
 
 @section('content')
 <div style="max-width:650px">

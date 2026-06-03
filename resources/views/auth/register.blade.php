@@ -33,15 +33,14 @@
         <input type="password" name="password_confirmation" class="form-control" required>
     </div>
 
-    <button type="submit" class="btn w-100 text-white fw-medium"
-            style="background-color: #2d6a4f;">
+    <button type="submit" class="btn btn-bosten w-100">
         Créer mon compte
     </button>
 
-    <hr>
+    <div class="divider">ou</div>
     <p class="text-center mb-0 small">
         Déjà un compte ?
-        <a href="{{ route('login') }}" class="text-decoration-none fw-medium"
+        <a href="{{ route('login') }}" class="text-decoration-none fw-semibold"
            style="color: #2d6a4f;">Se connecter</a>
     </p>
 </form>

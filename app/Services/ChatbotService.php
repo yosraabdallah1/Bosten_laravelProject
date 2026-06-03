@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Conversation;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\Http;
 
 class ChatbotService

@@ -16,9 +16,17 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user   = $request->user();
+        $orders = collect();
+
+        if (!$user->is_admin && $request->tab === 'orders') {
+            $orders = $user->orders()
+                           ->with('items.product')
+                           ->latest()
+                           ->paginate(5);
+        }
+
+        return view('profile.edit', compact('user', 'orders'));
     }
 
     /**

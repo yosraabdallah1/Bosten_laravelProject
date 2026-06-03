@@ -1,5 +1,8 @@
 @extends('layouts.admin')
 @section('title', 'Gestion des commandes')
+@section('breadcrumb')
+    <li class="breadcrumb-item active">Commandes</li>
+@endsection
 
 @section('content')
 <h4 class="fw-bold mb-4">📦 Toutes les commandes</h4>

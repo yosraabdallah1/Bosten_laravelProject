@@ -48,6 +48,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Gestion des produits
+        Route::get('/products', [ProductController::class, 'index_admin'])->name('products.index');
         Route::resource('products', ProductController::class)
             ->except(['index', 'show']);
 
@@ -61,3 +62,9 @@ Route::middleware(['auth', 'admin'])
 
 // Routes auth générées par Breeze
 require __DIR__.'/auth.php';
+
+
+// ─── Démo de la navigation ───────────────────────────────
+Route::get('/demo/navbar', function () {
+    return view('demo.navbar-demo');
+})->name('navbar.demo');

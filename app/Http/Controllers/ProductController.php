@@ -42,6 +42,28 @@ class ProductController extends Controller
 
     // ── Admin CRUD ───────────────────────────────────────────
 
+    public function index_admin(Request $request)
+    {
+        $query = Product::with('category');
+
+        if ($request->search) {
+            $query->where('name', 'like', '%'.$request->search.'%');
+        }
+        if ($request->category) {
+            $query->where('category_id', $request->category);
+        }
+        if ($request->stock === 'low') {
+            $query->where('stock', '>', 0)->where('stock', '<', 5);
+        } elseif ($request->stock === 'out') {
+            $query->where('stock', 0);
+        }
+
+        $products   = $query->latest()->paginate(15);
+        $categories = Category::all();
+
+        return view('admin.products.index', compact('products', 'categories'));
+    }
+
     public function create()
     {
         $categories = Category::all();
@@ -57,10 +79,16 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
-            'is_active'   => 'boolean',
         ]);
 
-        $data['slug'] = Str::slug($data['name']);
+        // Générer un slug unique
+        $slug = Str::slug($data['name']);
+        $original = $slug;
+        $count = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $original . '-' . $count++;
+        }
+        $data['slug']      = $slug;
         $data['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
@@ -70,8 +98,8 @@ class ProductController extends Controller
 
         Product::create($data);
 
-        return redirect()->route('admin.dashboard')
-                         ->with('success', 'Produit créé avec succès !');
+        return redirect()->route('admin.products.index')
+                         ->with('success', 'Produit "' . $data['name'] . '" créé avec succès !');
     }
 
     public function edit(Product $product)
@@ -89,10 +117,16 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
-            'is_active'   => 'boolean',
         ]);
 
-        $data['slug']      = Str::slug($data['name']);
+        // Slug unique en ignorant le produit actuel
+        $slug = Str::slug($data['name']);
+        $original = $slug;
+        $count = 1;
+        while (Product::where('slug', $slug)->where('id', '!=', $product->id)->exists()) {
+            $slug = $original . '-' . $count++;
+        }
+        $data['slug']      = $slug;
         $data['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('image')) {
@@ -102,15 +136,15 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('admin.dashboard')
-                         ->with('success', 'Produit mis à jour !');
+        return redirect()->route('admin.products.index')
+                         ->with('success', 'Produit "' . $product->name . '" mis à jour !');
     }
 
     public function destroy(Product $product)
     {
         $product->update(['is_active' => false]);
 
-        return redirect()->route('admin.dashboard')
-                         ->with('success', 'Produit désactivé.');
+        return redirect()->route('admin.products.index')
+                         ->with('success', 'Produit "' . $product->name . '" désactivé.');
     }
 }

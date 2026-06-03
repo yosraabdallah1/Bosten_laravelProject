@@ -1,5 +1,9 @@
 @extends('layouts.admin')
 @section('title', 'Ajouter un produit')
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Produits</a></li>
+    <li class="breadcrumb-item active">Créer</li>
+@endsection
 
 @section('content')
 <div style="max-width:650px">

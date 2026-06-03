@@ -41,15 +41,15 @@
         @endif
     </div>
 
-    <button type="submit" class="btn w-100 text-white fw-medium"
+    <button type="submit" class="btn btn-bosten w-100"
             style="background-color: #2d6a4f;">
         Se connecter
     </button>
 
-    <hr>
+    <div class="divider">ou</div>
     <p class="text-center mb-0 small">
         Pas encore de compte ?
-        <a href="{{ route('register') }}" class="text-decoration-none fw-medium"
+        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold"
            style="color: #2d6a4f;">S'inscrire</a>
     </p>
 </form>
