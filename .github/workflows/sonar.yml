@@ -118,7 +118,7 @@ jobs:
           args: >
             -Dsonar.projectKey=yosraabdallah1_Bosten_laravelProject
             -Dsonar.organization=yosraabdallah1
-            -Dsonar.projectName=Bosten Laravel E-commerce
+            -Dsonar.projectName=Bosten_Laravel_Ecommerce
             -Dsonar.sources=app,routes,database
             -Dsonar.tests=tests
             -Dsonar.php.coverage.reportPaths=reports/coverage.xml
