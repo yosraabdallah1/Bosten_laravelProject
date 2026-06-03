@@ -116,8 +116,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=yosraabdallah1_Bosten_laravelProject
+            -Dsonar.organization=yosraabdallah1
             -Dsonar.projectName=Bosten Laravel E-commerce
             -Dsonar.sources=app,routes,database
             -Dsonar.tests=tests
