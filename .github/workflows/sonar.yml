@@ -1,0 +1,127 @@
+name: Tests & SonarCloud Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test-and-sonar:
+    name: PHP Tests + Coverage + SonarCloud
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: bosten_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Requis par SonarCloud pour blame annotations
+
+      # ── 2. PHP + Xdebug ──────────────────────────────────────────
+      - name: Setup PHP 8.2 with Xdebug
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_sqlite, pdo_mysql, gd, xdebug
+          coverage: xdebug
+          tools: composer:v2
+
+      # ── 3. Node.js ────────────────────────────────────────────────
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 4. Cache Composer ─────────────────────────────────────────
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      # ── 5. Installer dépendances PHP ──────────────────────────────
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      # ── 6. Installer dépendances Node ─────────────────────────────
+      - name: Install npm dependencies
+        run: npm ci
+
+      # ── 7. Build assets (pour éviter les erreurs de vue) ──────────
+      - name: Build frontend assets
+        run: npm run build
+
+      # ── 8. Configurer l'environnement ─────────────────────────────
+      - name: Configure environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+        env:
+          APP_ENV: testing
+
+      # ── 9. Créer le dossier de rapport ────────────────────────────
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      # ── 10. Lancer les tests avec couverture ──────────────────────
+      - name: Run PHPUnit tests with coverage
+        run: |
+          XDEBUG_MODE=coverage php artisan test \
+            --coverage-clover=reports/coverage.xml \
+            --coverage-html=reports/coverage-html \
+            --log-junit=reports/junit.xml
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+          GEMINI_API_KEY: "test-key-disabled"
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+
+      # ── 11. Upload résultats tests (artefacts) ────────────────────
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            reports/coverage.xml
+            reports/junit.xml
+            reports/coverage-html/
+          retention-days: 30
+
+      # ── 12. Analyse SonarCloud ────────────────────────────────────
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.projectName=Bosten Laravel E-commerce
+            -Dsonar.sources=app,routes,database
+            -Dsonar.tests=tests
+            -Dsonar.php.coverage.reportPaths=reports/coverage.xml
+            -Dsonar.testExecutionReportPaths=reports/junit.xml
+            -Dsonar.exclusions=vendor/**,node_modules/**,public/**,storage/**,bootstrap/cache/**,resources/views/**
+            -Dsonar.sourceEncoding=UTF-8

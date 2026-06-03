@@ -3,6 +3,7 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         stopOnFailure="false"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -12,25 +13,40 @@
             <directory>tests/Feature</directory>
         </testsuite>
     </testsuites>
+
+    <!-- Couverture de code : inclure uniquement le code applicatif -->
     <source>
         <include>
-            <directory>app</directory>
+            <directory suffix=".php">app/Services</directory>
+            <directory suffix=".php">app/Models</directory>
+            <directory suffix=".php">app/Http/Controllers</directory>
+            <directory suffix=".php">app/Http/Middleware</directory>
+            <directory suffix=".php">app/Policies</directory>
         </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>node_modules</directory>
+            <directory>storage</directory>
+            <file>app/Http/Controllers/Controller.php</file>
+        </exclude>
     </source>
+
     <php>
-        <env name="APP_ENV" value="testing"/>
+        <env name="APP_ENV"                value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="DB_URL" value=""/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="BCRYPT_ROUNDS"          value="4"/>
+        <env name="BROADCAST_CONNECTION"   value="null"/>
+        <env name="CACHE_STORE"            value="array"/>
+        <env name="DB_CONNECTION"          value="sqlite"/>
+        <env name="DB_DATABASE"            value=":memory:"/>
+        <env name="DB_URL"                 value=""/>
+        <env name="MAIL_MAILER"            value="array"/>
+        <env name="QUEUE_CONNECTION"       value="sync"/>
+        <env name="SESSION_DRIVER"         value="array"/>
+        <env name="PULSE_ENABLED"          value="false"/>
+        <env name="TELESCOPE_ENABLED"      value="false"/>
+        <env name="NIGHTWATCH_ENABLED"     value="false"/>
+        <!-- Gemini désactivé en test -->
+        <env name="GEMINI_API_KEY"         value="test-key-disabled"/>
     </php>
 </phpunit>

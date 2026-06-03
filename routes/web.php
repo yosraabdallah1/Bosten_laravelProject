@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Chatbot
     Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
     Route::post('/chatbot', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+    Route::post('/chatbot/clear', [ChatbotController::class, 'clear'])->name('chatbot.clear');
 });
 
 // ─── Routes admin ─────────────────────────────────────────────────
