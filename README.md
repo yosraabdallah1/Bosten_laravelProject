@@ -376,41 +376,6 @@ $env:XDEBUG_MODE="coverage"; php artisan test --coverage-clover=reports/coverage
 | Feature | `ChatbotEndpointTest` | 9 | Endpoint `/chatbot`, validation, sauvegarde DB, clear |
 | Feature | Auth/* (Breeze) | 25 | Login, register, password reset, email verification, profile |
 
-### Bonnes pratiques appliquées
-
-- **`RefreshDatabase`** sur chaque classe de test → base SQLite in-memory isolée par test
-- **Factories** dédiées avec states (`admin()`, `inactive()`, `outOfStock()`, `lowStock()`, `pending()`...)
-- **Mocks Guzzle** via `MockHandler` pour `callGemini()` sans appel réseau réel
-- **`$this->mock()`** Laravel pour mocker `GeminiChatbotService` dans les tests Feature
-- **`Storage::fake('public')`** pour les tests d'upload d'image
-- **Assertions strictes** : `assertDatabaseHas`, `assertDatabaseMissing`, `assertDatabaseCount`
-
----
-
-## Qualité du code — SonarCloud
-
-### Configuration
-
-Le fichier `sonar-project.properties` à la racine configure l'analyse :
-
-```properties
-sonar.projectKey=votre-username_bosten
-sonar.organization=votre-username
-sonar.sources=app,routes,database
-sonar.tests=tests
-sonar.php.coverage.reportPaths=reports/coverage.xml
-sonar.exclusions=vendor/**,node_modules/**,public/**,storage/**,resources/views/**
-```
-
-### Setup SonarCloud
-
-1. Créer un compte sur [sonarcloud.io](https://sonarcloud.io) et lier le dépôt GitHub
-2. Récupérer le `Project Key` et l'`Organization` depuis le dashboard SonarCloud
-3. Mettre à jour `sonar-project.properties` avec ces valeurs
-4. Ajouter les secrets GitHub :
-   - `SONAR_TOKEN` → token généré sur SonarCloud (Account > Security)
-   - `SONAR_PROJECT_KEY` → clé du projet
-   - `SONAR_ORGANIZATION` → organisation
 
 ### Pipeline GitHub Actions
 
